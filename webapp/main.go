@@ -1,5 +1,3 @@
-//we will create a simple web server as of now
-
 package main
 
 import (
@@ -10,21 +8,18 @@ import (
 func main() {
 	http.HandleFunc("/", func(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte(`
-			 <html>
-			    <head>
-                   <title> web server </title>
-                 </head>
-                 <body>
-                    <h1> let's hope our simple web server works !!! </h1>
-                 </body>
-              </html>    			     
-
+            <html>
+            <head>
+            <title> web server </title>
+            <body>
+            <h1> consistency is the key and one day I will be where I want to be </h1>
+            </body>
+            </html>
 			`))
 	})
 
-	// start the server
+	//  start the web server at port :8080 for now
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(" error code :", err)
+		log.Fatal("error information:", err)
 	}
-
 }
