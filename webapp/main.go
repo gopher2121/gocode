@@ -27,9 +27,13 @@ func (t *templateHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	// create a new room
+	r := newRoom()
 
 	http.Handle("/", &templateHandler{filename: "index.html"})
-
+	http.Handle("/room", r)
+	// run the room as a separate go routine
+	go r.run()
 	/*
 				// some old code to test whether server is working or not . Remove it once the final code is ready
 			http.HandleFunc("/", func(rw http.ResponseWriter, req *http.Request) {
