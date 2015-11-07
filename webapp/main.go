@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"github.com/gocode/trace"
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/google"
+	"github.com/stretchr/objx"
 	"log"
 	"net/http"
 	"os"
@@ -26,13 +29,26 @@ func (t *templateHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
-	t.templ.Execute(rw, req)
+	data := map[string]interface{}{
+		"Host": req.Host,
+	}
+	if authCookie, err := req.Cookie("auth"); err == nil {
+		data["UserData"] = objx.MustFromBase64(authCookie.Value)
+	}
+	t.templ.Execute(rw, data)
 }
 
 func main() {
 	// command line flags to make the address configurable
 	var addr = flag.String("addr", ":8080", "address of the application")
 	flag.Parse()
+
+	//set up gomniauth
+	gomniauth.SetSecurityKey("No matter how bad it is or how bad it gets I am gonna make it")
+	gomniauth.WithProviders(
+		google.New("395935673361-5p9o8soma5rsoh2j67nvqqc8urfno5vn.apps.googleusercontent.com", "7mF1VxAD5S7FlK4cToQmGZiJ", "http://localhost:8080/auth/callback/google"),
+	)
+
 	// create a new room
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
@@ -41,6 +57,7 @@ func main() {
 	//	http.Handle("/", &templateHandler{filename: "index.html"})
 
 	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
 	// run the room as a separate go routine
 	go r.run()
