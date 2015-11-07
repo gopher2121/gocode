@@ -1,8 +1,11 @@
 package main
 
 import (
+	"flag"
+	"github.com/gocode/trace"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 	"text/template"
@@ -23,12 +26,16 @@ func (t *templateHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
-	t.templ.Execute(rw, nil)
+	t.templ.Execute(rw, req)
 }
 
 func main() {
+	// command line flags to make the address configurable
+	var addr = flag.String("addr", ":8080", "address of the application")
+	flag.Parse()
 	// create a new room
 	r := newRoom()
+	r.tracer = trace.New(os.Stdout)
 
 	http.Handle("/", &templateHandler{filename: "index.html"})
 	http.Handle("/room", r)
@@ -49,7 +56,8 @@ func main() {
 			})
 	*/
 	//  start the web server at port :8080 for now
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("starting web server on ", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("error information:", err)
 	}
 }

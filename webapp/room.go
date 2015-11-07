@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gocode/trace"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -19,6 +20,9 @@ type room struct {
 
 	// map to hold the current clients in the room
 	clients map[*client]bool
+
+	// tracing the code
+	tracer trace.Tracer
 }
 
 func newRoom() *room {
@@ -35,18 +39,22 @@ func (r *room) run() {
 		select {
 		case client := <-r.join:
 			r.clients[client] = true
+			r.tracer.Trace("new client joined")
 		case client := <-r.leave:
 			delete(r.clients, client)
 			close(client.send)
+			r.tracer.Trace("client left")
 		case msg := <-r.forward:
 			// forward the message to all clients
 			for client := range r.clients {
 				select {
 				case client.send <- msg:
 					//send the message
+					r.tracer.Trace("sent to client")
 				default:
 					delete(r.clients, client)
 					close(client.send)
+					r.tracer.Trace("failed to send")
 				}
 			}
 		}
