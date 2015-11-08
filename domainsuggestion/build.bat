@@ -1,0 +1,19 @@
+#!/bin/bash
+echo Building domainsuggestion...
+go build -o ../domainsuggestion/lib/domainsuggestion
+echo Building synonyms...
+cd ../synonyms
+go build -o ../domainsuggestion/lib/synonyms
+echo Building available...
+cd ../available
+go build -o ../domainsuggestion/lib/available
+echo Building sprinkle...
+cd ../sprinkle
+go build -o ../domainsuggestion/lib/sprinkle
+echo Building coolify...
+cd ../coolify
+go build -o ../domainsuggestion/lib/coolify
+echo Building domainify...
+cd ../domainify
+go build -o ../domainsuggestion/lib/domainify
+echo Done.
