@@ -35,4 +35,8 @@ func main() {
 	slicedouble = append(slicedouble, 1, 3, 4)
 	fmt.Println(slicedouble, len(slicedouble), cap(slicedouble))
 
+	// slice using make
+	slicemk := make([]int, 3)
+	fmt.Println(slicemk)
+
 }
