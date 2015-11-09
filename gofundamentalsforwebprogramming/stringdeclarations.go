@@ -10,4 +10,10 @@ func main() {
 	c[0] = 'G'
 	s2 := string(c)
 	fmt.Println(s2)
+
+	// multiple line string
+	mul := `hello 
+
+			world`
+	fmt.Println("mul:", mul)
 }
