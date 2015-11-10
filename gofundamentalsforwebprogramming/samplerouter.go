@@ -1,13 +1,30 @@
-// accept the request and then create a new connection 
-// and then start a new goroutine , passing the request data to 
-// go c.serve
+// simple router
 
-type ServeMux struct {
-	mu sync.RWMutex 
-	m map[string]muxEntry
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+type myMux struct {
 }
 
-type muxEntry struct {
-	explicit bool
-	h Handler
+func (m *myMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/" {
+		// route to sayHelloName
+		sayHelloName(w, r)
+		return
+	}
+	http.NotFound(w, r)
+	return
+
+}
+func sayHelloName(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "yjgjg")
+}
+
+func main() {
+	mux := &myMux{}
+	http.ListenAndServe(":8080", mux)
 }
